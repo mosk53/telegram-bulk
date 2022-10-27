@@ -308,7 +308,7 @@ class send_screen(MDScreen):
                                 SLEEP_TIME = int(random.uniform(1, 5))
                             try:
                                 print("Sende Nachricht", user['username'])
-                                client.send_file(user['username'], folder_selected)
+                                client.send_file(user['user id'], folder_selected)
                                 del users[users.index(user)]
                                 pickle.dump(users, open("users.p", "wb"))       
                                 print("Warte {} sekunden".format(SLEEP_TIME))
@@ -340,7 +340,7 @@ class send_screen(MDScreen):
                             SLEEP_TIME = int(random.uniform(1, 5))
                         try:
                             print("Sende Bild an: ", user['username'])
-                            client.send_file(user['username'], folder_selected, caption=caption)
+                            client.send_file(user['user id'], folder_selected, caption=caption)
                             del users[users.index(user)]
                             pickle.dump(users, open("users.p", "wb"))
                             print("Warte {} sekunden".format(SLEEP_TIME))

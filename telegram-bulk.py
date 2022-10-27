@@ -70,15 +70,16 @@ called_rapid = False
 safe_mode = False
 normal_mode = False
 rapid_mode = False
+SLEEP_TIME = 61
 
 # Clear last session
-# try:
-#     for item in os.listdir(dir_name):
-#         if item.endswith(".session"):
-#             os.remove(os.path.join(dir_name, item))
-# except Exception as e:
-#     logger.error(e)
-#     pass
+try:
+    for item in os.listdir(dir_name):
+        if item.endswith(".session"):
+            os.remove(os.path.join(dir_name, item))
+except Exception as e:
+    logger.error(e)
+    pass
 
 # Telegram client
 try:
@@ -133,6 +134,11 @@ class main_screen(MDScreen):
             get_groups()
             self.manager.current = 'group_s'
     pass
+    
+    def kacken(self):
+        print("kacken")
+
+
 
 class group_screen(MDScreen):
 
@@ -199,13 +205,17 @@ class group_screen(MDScreen):
 class settings_screen(MDScreen):
 
     def safe_settings(self, value1, value2, value3):
-        config_parser.set('account1', 'api_id', value1)
-        config_parser.set('account1', 'api_hash', value2)
-        config_parser.set('account1', 'phone', value3)
-        with open(str(config_path), 'w') as configfile:
-            config_parser.write(configfile)
-        logger.info('Settings saved')
-        sys.exit()
+        if value1 and value2 and value3:
+            config_parser.set('account1', 'api_id', value1)
+            config_parser.set('account1', 'api_hash', value2)
+            config_parser.set('account1', 'phone', value3)
+            with open(str(config_path), 'w') as configfile:
+                config_parser.write(configfile)
+            logger.info('Settings saved')
+            sys.exit()
+        else:
+            logger.info('Settings not saved')
+            self.manager.current = 'main_s'
         pass
 
     def show_settings(self):
@@ -248,6 +258,7 @@ class settings_screen(MDScreen):
             logger.info('Rapid mode wurde deaktiviert')
 
 class send_screen(MDScreen):
+    global SLEEP_TIME
 
     def text(self, message):
         try:
@@ -284,6 +295,7 @@ class send_screen(MDScreen):
             pass
     
     def send_bild(self, caption):
+        global SLEEP_TIME
         if caption == "":
                 try:
                     global folder_selected
@@ -353,6 +365,7 @@ class send_screen(MDScreen):
     pass
 
 class datei_screen(MDScreen):
+    global SLEEP_TIME
 
     def file_selected(self, value):
         global folder_selected
@@ -391,11 +404,6 @@ class myApp(MDApp):
         sm.add_widget(auth_screen(name='auth_s'))
         return sm
 
-class mysetting(MDApp):
-    def build(self):
-        sm = ScreenManager()
-        sm.add_widget(settings_screen(name='settings_s'))
-        return sm
 
 if __name__ == '__main__':
     myApp().run()

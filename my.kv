@@ -1,0 +1,231 @@
+#:kivy 2.1.0
+#: import SlideTransition kivy.uix.screenmanager.SlideTransition
+#: import RecycleView kivy.uix.recycleview.RecycleView
+ScreenManager:
+    main_screen:
+    group_screen:
+    settings_screen:
+    send_screen:
+    datei_screen:
+
+<main_screen>:
+    Image:
+        source: 'daten/main_logo.jpg'
+    MDLabel:
+        text: 'Hauptmenü'
+        halign: 'center'
+        font_style: 'H2'
+        theme_text_color: "Custom"
+        text_color: 0, 0, 0, 0
+    MDBoxLayout:
+        pos_hint: {"center_x": .5, "center_y": .5}
+        height: self.minimum_height
+        orientation: 'vertical'
+        padding: dp(10)
+        spacing: dp(10)
+        MDRaisedButton:
+            text: 'Start'
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            on_release: 
+                root.anmelden()
+        MDRaisedButton:
+            text: 'Einstellungen'
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            on_release:
+                app.root.transition = SlideTransition(direction='right')
+                root.manager.current = 'settings_s'
+                root.kacken()
+                
+
+<auth_screen>:
+    on_enter: root.load_number()
+    MDGridLayout:
+        cols: 1
+        padding: dp(10)
+        spacing: dp(10)
+        MDLabel:
+            id: code_label
+            text: 'Bitte geben Sie Ihre Authentifizierungsdaten ein'
+            halign: 'center'
+        MDTextField:
+            id: code_field
+            hint_text: 'Hier Code eingeben'
+            helper_text_mode: 'on_focus'
+            icon_right: 'account'
+            icon_right_color: app.theme_cls.primary_color
+            required: True
+        MDGridLayout:
+            cols: 2
+            padding: dp(100)
+            spacing: dp(100)
+            MDRaisedButton:
+                text: 'Zurück'
+                pos_hint: {'center_x': .8, 'center_y': .5}
+                on_release:
+                    app.root.transition = SlideTransition(direction='right')
+                    root.manager.current = 'main_s'
+            MDRaisedButton:
+                text: 'Senden'
+                pos_hint: {'center_x': .8, 'center_y': .5}
+                on_release: 
+                    root.code_senden(code_field.text)
+
+
+<group_screen>:
+    MDBoxLayout:
+        padding: '25dp'
+        orientation: 'vertical'
+        RV:
+            id: rv
+            viewclass: 'MDLabel'
+            RecycleBoxLayout:
+                default_size: None, dp(56)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+                bold: True
+                width: self.minimum_width
+
+        MDTextField:
+            size_hint_y: None
+            height: dp(56)
+            id: gruppe_field
+            hint_text: 'Gruppen-Nummer eingeben'
+        MDBoxLayout:
+            spacing: '8dp'
+            size_hint_y: 0.3
+            height: self.minimum_height
+            orientation: 'horizontal'
+            MDRaisedButton:
+                text: 'Zurück'
+                on_release: 
+                    app.root.transition = SlideTransition(direction='right')
+                    root.manager.current = 'main_s'
+                    
+            MDRaisedButton:
+                text: 'Aktualisieren'
+                on_release: 
+                    root.refresh_data()
+            MDRaisedButton:
+                text: 'Hinzufügen'
+                on_release: 
+                    root.get_members(gruppe_field.text)
+            MDRaisedButton:
+                text: 'Letzte Gruppe'
+                on_release: 
+                    root.load_members()
+
+<settings_screen>:
+    MDBoxLayout:
+        padding: '25dp'
+        orientation: 'vertical'
+        MDTextField:
+            id: api_id
+            hint_text: 'API ID'
+        MDTextField:
+            id: api_hash
+            hint_text: 'API Hash'
+        MDTextField:
+            id: phone
+            hint_text: 'Phone Number'
+        MDBoxLayout:
+            orientation: 'horizontal'
+            MDBoxLayout:
+                orientation: 'vertical'
+                MDLabel:
+                    text: 'Safe Mode'
+                MDLabel:
+                    text: 'Normal Mode'
+                MDLabel:
+                    text: 'Rapid Mode'
+            MDBoxLayout:
+                spacing: '18dp'
+                orientation: 'vertical'
+                MDSwitch:
+                    id: safe_mode
+                    on_active: root.switch_safe()
+                MDSwitch:
+                    id: normal_mode
+                    on_active: root.switch_normal()
+                    active_norm_pos: 1
+                MDSwitch:
+                    id: rapid_mode
+                    on_active: root.switch_rapid()
+        MDBoxLayout:
+            spacing: '8dp'
+            padding: '10dp'
+            size_hint_y: 0.3
+            height: self.minimum_height
+            orientation: 'horizontal'
+            MDRaisedButton:
+                text: 'Zurück'
+                on_release:
+                    app.root.transition = SlideTransition(direction='left') 
+                    root.manager.current = 'main_s'
+                    
+            MDRaisedButton:
+                text: 'Speichern'
+                on_release: 
+                    root.safe_settings(api_id.text, api_hash.text, phone.text)
+            MDRaisedButton:
+                text: 'Aktuelle Einstellungen anzeigen'
+                on_release: 
+                    root.show_settings()
+            
+<send_screen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: '25dp'
+        MDBoxLayout:
+            orientation: 'vertical'
+            MDTextField:
+                mode: "rectangle"
+                multiline: True 
+                id: message
+                hint_text: 'Hier Nachricht eingeben'
+                size_hint_y: 0.3
+            MDTextField:
+                mode: "rectangle"
+                md_bg_color: 0, 0, 0, 0
+                multiline: True 
+                id: caption
+                hint_text: 'Hier Caption eingeben'
+                size_hint_y: 0.3
+        MDBoxLayout:
+            spacing: '8dp'
+            padding: '10dp'
+            size_hint_y: 0.3
+            height: self.minimum_height
+            orientation: 'horizontal'
+            MDRaisedButton:
+                text: 'Zurück'
+                on_release:
+                    app.root.transition = SlideTransition(direction='left') 
+                    root.manager.current = 'main_s'
+                    
+            MDRaisedButton:
+                text: 'Text senden'
+                on_release: 
+                    root.text(message.text)
+            MDRaisedButton:
+                text: 'Bild senden'
+                on_release: 
+                    root.send_bild(caption.text)
+            MDRaisedButton:
+                text: 'Bild Wählen'
+                on_release:
+                    app.root.transition = SlideTransition(direction='left')
+                    root.manager.current = 'datei_s'
+                    
+
+<datei_screen>:
+    md_bg_color: 0, 0, 0, 1
+    FileChooserIconView:
+        id: filechooser
+        on_selection: 
+            root.file_selected(filechooser.selection)
+            root.manager.current = 'send_s'
+
+            
+
